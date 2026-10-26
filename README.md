@@ -81,12 +81,15 @@ the command with `| MATRIX_REF=main bash`.
 **Homebrew**
 
 ```sh
+brew tap whiskeytangofussell/tap
+brew trust --formula whiskeytangofussell/tap/matrix-screensaver
 brew install whiskeytangofussell/tap/matrix-screensaver
 cp -R "$(brew --prefix matrix-screensaver)/MatrixScreenSaver.saver" ~/Library/Screen\ Savers/
 ```
 
-Homebrew can't write to `~/Library`, so the second line activates the saver
-(brew prints it after installing). Run it again after `brew upgrade`.
+Homebrew only loads formulae from third-party taps you've trusted, hence the
+second line. Homebrew can't write to `~/Library`, so the last line activates the
+saver (brew prints it after installing). Run it again after `brew upgrade`.
 
 Then open **System Settings → Screen Saver**, choose **Matrix**, and click
 **Options…** to customize it.
