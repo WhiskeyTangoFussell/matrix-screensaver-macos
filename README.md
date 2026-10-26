@@ -42,7 +42,10 @@ served as the spec, and everything was designed fresh for macOS.
 - Builds with **Command Line Tools only**. No Xcode project is needed; a `Makefile` drives `swiftc`.
 - Options sheet with a **live animated preview**.
 - **19 color modes**: Tokyo Night (Neon), Rainbow Spectrum (Pastel) and Rainbow Spectrum (Vivid), all multi-color and blendable along streams, plus 15 solid colors and an animated Rainbow.
-- 5 character sets: Classic ASCII (cmatrix default), Katakana, Katakana + Latin, Binary, Hex.
+- 8 character sets: Classic (cmatrix's ASCII, default), Hexadecimal, Binary, Unicode
+  with letters from nine writing systems, Katakana, Katakana (Combined) with Latin
+  letters and symbols, Katakana (Enhanced) with normal and mirrored glyphs, and
+  Katakana (Film) with mirrored glyphs like the movie.
 - Any installed monospaced font (default CaskaydiaCove NF Bold), 8–48 pt.
 - Adjustable speed and speed variance, density, trail length and length variance,
   and glyph-change rate.
@@ -99,7 +102,7 @@ Running `build/snapshot` with no arguments lists them.
 |---|---|---|---|
 | Font | System Monospaced (SF Mono) + every installed font whose letters/digits are fixed-width (includes Nerd Font "NF" builds that macOS doesn't flag as fixed-pitch) | CaskaydiaCove NF Bold (`CaskaydiaCoveNF-Bold`) | Falls back to SF Mono if the font isn't installed. Pick weight by choosing the face (Bold, SemiBold…). Missing glyphs (e.g. katakana) fall back to a system font automatically. |
 | Size | 8–48 pt | 16 | Glyph size. The System Settings thumbnail scales this down to fit. |
-| Characters | Classic ASCII · Katakana · Katakana + Latin · Binary · Hexadecimal | Classic ASCII | Classic is cmatrix's printable ASCII (`!`…`~`). Katakana uses half-width forms U+FF66–FF9D plus digits. |
+| Characters | Classic · Hexadecimal · Binary · Unicode · Katakana · Katakana (Combined) · Katakana (Enhanced) · Katakana (Film) | Classic | Classic (`classic`) is cmatrix's printable ASCII (`!`…`~`). Katakana uses half-width forms U+FF66–FF9D plus digits. **Combined** (`mixed`) adds Latin capitals and symbols. **Enhanced** (`katakanaEnhanced`) adds a left-right mirrored copy of every katakana, so both orientations rain together. **Film** (`katakanaFilm`) is mirrored katakana with normal digits and the symbols `:."=*+-<>\|¦`, like the movie. Mirroring uses a flipped copy of the font (`GlyphStyle.mirroredCharacters`), so it costs nothing per frame. **Unicode** (`unicode`) mixes ~600 standalone letters from Latin (accented), Greek, Cyrillic, Hebrew, Arabic, Armenian, Georgian and Runic with katakana and digits; combining marks are filtered out by Unicode category. Scripts the font lacks come from system fallback fonts; fallback glyphs over 1.25× the font's `0` width are skipped (they would widen every column), as are characters only `LastResort` can draw. |
 | Color | **Tokyo Night (Neon)**, **Rainbow Spectrum (Pastel)**, **Rainbow Spectrum (Vivid)**, Matrix Green, Emerald, Lime, Mint, Cyan, Ice Blue, Azure, Violet, Magenta, Pink, Red, Orange, Amber, Gold, White, **Rainbow** | Tokyo Night (Neon) | Tokyo Night uses 9 neon colors, blended along each stream or one per stream (see *Blend colors*): pink `#FF9ED8 #FF4FAE #C2187A`, purple `#CDA8FF #A25CFF #6C2BD9`, blue `#8CD5FF #4D8DFF #2A52D6` (light/medium/dark). Rainbow Spectrum uses 8 hue families at 0°, 30°, 55°, 120°, 185°, 220°, 270° and 315° (red → magenta), each softened toward pastel: light = 60% white, medium = 40% white, dark = 25% white at 75% brightness. Rainbow Spectrum (Vivid) uses the same 8 hues at full saturation: light = 20% white, medium = pure hue, dark = 70% brightness. Rainbow sweeps hues across the columns and slowly cycles. |
 | Speed | 1–10 | 4 | Head speed = `3 × (40/3)^((speed−1)/9)` rows/sec, an exponential curve: 1 → 3, 4 ≈ 7, 7 ≈ 17, 10 → 40. |
 | Speed variance | +0–300% (steps of 25) | +150% | The base Speed is the **floor**: each stream falls at base × a random factor in `1…(1 + v)`, so +150% → 1×–2.5× (≈7–18 rows/s at default speed), like cmatrix `-a`. 0% gives every stream the base speed. |
@@ -364,7 +367,7 @@ Keep the build **warning-free**.
 ## Roadmap / ideas
 
 - [ ] Metal renderer for very small fonts on 6K/8K displays.
-- [ ] Mirrored katakana option (as seen in the film).
+- [x] Mirrored katakana option (as seen in the film): Katakana (Enhanced) and Katakana (Film).
 - [ ] "Message" mode that spells a custom phrase through the rain.
 - [ ] Per-display color or style.
 - [ ] Optional 60 fps (change `MatrixScene.frameInterval`; frames cost ~2–7 ms,
@@ -382,6 +385,21 @@ Keep the build **warning-free**.
   filled screen. Changes every render, so the render-check baseline was regenerated.
 
 **Look**
+- **Katakana (Enhanced)** character set (`katakanaEnhanced`): katakana both normal
+  and mirrored, plus digits.
+- **Katakana (Film)** character set (`katakanaFilm`): mirrored katakana with normal
+  digits and symbols, like the movie. Mirrored glyphs come from a flipped copy of
+  each font (`GlyphAtlas.Entry.xOffset` keeps them centered). Existing sets render
+  pixel-identical; render-check gained a mirrored case.
+- Character set menu reordered to Classic, Hexadecimal, Binary, Unicode, then the
+  katakana sets; "Classic ASCII (cmatrix)" is now just **Classic** and "Katakana + Latin"
+  is **Katakana (Combined)**. Raw values are unchanged,
+  so saved choices carry over.
+- **Unicode** character set (`unicode`): ~600 letters from Latin, Greek, Cyrillic,
+  Hebrew, Arabic, Armenian, Georgian and Runic, plus katakana and digits.
+- `GlyphAtlas` now skips fallback glyphs wider than 1.25× the primary font's `0`
+  and characters that only `LastResort` can draw (a "missing glyph" box). Existing
+  sets render pixel-identical; render-check gained a Unicode case.
 - **Rainbow Spectrum (Vivid)** theme (key `rainbowVivid`): the Pastel theme's 8 hue
   families at full saturation (light = 20% white, medium = pure hue, dark = 70%
   brightness).

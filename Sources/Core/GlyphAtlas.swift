@@ -8,6 +8,9 @@ struct GlyphAtlas {
         var fontIndex: Int
         var glyph: CGGlyph
         var advance: CGFloat
+        /// Mirrored glyphs draw leftward from their origin, so they're
+        /// positioned one advance further right.
+        var xOffset: CGFloat = 0
     }
 
     /// `fonts[0]` is the primary font; the rest are fallbacks.
@@ -26,23 +29,42 @@ struct GlyphAtlas {
     init(style: GlyphStyle, fontName: String, size: CGFloat) {
         let primary = Self.makeFont(named: fontName, size: size)
         var fonts = [primary]
+        var mirroredIndex: [Int: Int] = [:]   // font index → its mirrored copy
         var entries: [Entry] = []
 
-        for character in style.characters {
+        // Fallback glyphs much wider than the primary font's would widen every
+        // column (the widest glyph sets the pitch), so they're skipped.
+        let maxFallbackAdvance = (Self.entry(for: "0", in: primary, fontIndex: 0)?.advance ?? size * 0.6) * 1.25
+
+        func resolve(_ character: Character) -> Entry? {
             let text = String(character)
             if let entry = Self.entry(for: text, in: primary, fontIndex: 0) {
-                entries.append(entry)
-                continue
+                return entry
             }
             let fallback = CTFontCreateForString(primary, text as CFString, CFRange(location: 0, length: text.utf16.count))
             let name = CTFontCopyPostScriptName(fallback) as String
+            // LastResort draws a "missing character" box; better to leave it out.
+            guard name != "LastResort" else { return nil }
             let index = fonts.firstIndex { CTFontCopyPostScriptName($0) as String == name } ?? {
                 fonts.append(fallback)
                 return fonts.count - 1
             }()
-            if let entry = Self.entry(for: text, in: fonts[index], fontIndex: index) {
-                entries.append(entry)
-            }
+            return Self.entry(for: text, in: fonts[index], fontIndex: index)
+                .flatMap { $0.advance <= maxFallbackAdvance ? $0 : nil }
+        }
+
+        entries = style.characters.compactMap(resolve)
+        for character in style.mirroredCharacters {
+            guard var entry = resolve(character) else { continue }
+            let index = mirroredIndex[entry.fontIndex] ?? {
+                var flip = CGAffineTransform(scaleX: -1, y: 1)
+                fonts.append(CTFontCreateCopyWithAttributes(fonts[entry.fontIndex], 0, &flip, nil))
+                mirroredIndex[entry.fontIndex] = fonts.count - 1
+                return fonts.count - 1
+            }()
+            entry.fontIndex = index
+            entry.xOffset = entry.advance
+            entries.append(entry)
         }
         if entries.isEmpty, let zero = Self.entry(for: "0", in: primary, fontIndex: 0) {
             entries = [zero]

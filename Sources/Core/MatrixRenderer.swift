@@ -100,7 +100,7 @@ final class MatrixRenderer {
         var runBin = -1
 
         func position(of entry: GlyphAtlas.Entry, row: Int) -> CGPoint {
-            CGPoint(x: x + (atlas.cellWidth - entry.advance) / 2,
+            CGPoint(x: x + (atlas.cellWidth - entry.advance) / 2 + entry.xOffset,
                     y: top - CGFloat(row + 1) * atlas.cellHeight + atlas.baseline)
         }
 

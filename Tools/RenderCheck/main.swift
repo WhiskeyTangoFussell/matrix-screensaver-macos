@@ -26,6 +26,8 @@ let cases: [(name: String, configure: (inout MatrixSettings) -> Void)] = [
     ("rainbow", { $0.color = .rainbow }),
     ("matrix green, stepped", { $0.color = .matrixGreen; $0.glidingMotion = false }),
     ("katakana, fallback fonts", { $0.glyphStyle = .katakana; $0.fontName = "Menlo-Regular" }),
+    ("katakana enhanced, mirrored", { $0.glyphStyle = .katakanaEnhanced }),
+    ("unicode, mixed fallbacks", { $0.glyphStyle = .unicode }),
 ]
 let size = CGSize(width: 1000, height: 640)
 let scale = 2
