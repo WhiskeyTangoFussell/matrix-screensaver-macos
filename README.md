@@ -19,6 +19,7 @@ served as the spec, and everything was designed fresh for macOS.
 ## Contents
 
 - [Features](#features)
+- [Install](#install)
 - [Requirements](#requirements)
 - [Build, install, run](#build-install-run)
 - [Options reference](#options-reference)
@@ -32,6 +33,7 @@ served as the spec, and everything was designed fresh for macOS.
 - [Troubleshooting](#troubleshooting)
 - [Roadmap / ideas](#roadmap--ideas)
 - [Changelog](#changelog)
+- [License](#license)
 
 ---
 
@@ -57,6 +59,35 @@ served as the spec, and everything was designed fresh for macOS.
 - **Starts full**: the rain is fast-forwarded to a steady state before the first
   frame, so the screen is already filled when the saver starts.
 - Multi-display aware: saving options updates every running instance.
+
+## Install
+
+Needs macOS 15 Sequoia or later and Apple's Command Line Tools (the installer
+offers to install them). Either command builds the saver on your Mac, so
+Gatekeeper doesn't block it even though it isn't Developer ID signed.
+
+**One-line installer**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/WhiskeyTangoFussell/matrix-screensaver-macos/main/install.sh | bash
+```
+
+It downloads the latest release, runs `make install` and cleans up. Run it again
+to update. To remove: `curl -fsSL …/install.sh | bash -s -- --uninstall`.
+`MATRIX_REF=main` installs the current development version instead.
+
+**Homebrew**
+
+```sh
+brew install whiskeytangofussell/tap/matrix-screensaver
+cp -R "$(brew --prefix matrix-screensaver)/MatrixScreenSaver.saver" ~/Library/Screen\ Savers/
+```
+
+Homebrew can't write to `~/Library`, so the second line activates it (brew
+prints it after installing). After `brew upgrade`, run that line again.
+
+Then open **System Settings → Screen Saver**, choose **Matrix**, and click
+**Options…** to customize it.
 
 ## Requirements
 
@@ -147,6 +178,8 @@ matrix-screensaver-macos/
 ├── README.md                  ← you are here (living project reference)
 ├── CLAUDE.md                  ← short pointer for AI-assisted sessions
 ├── Makefile                   ← build / install / run / snapshot
+├── install.sh                 ← one-line installer (curl … | bash)
+├── LICENSE                    ← GPL-3.0
 ├── Resources/
 │   ├── Info.plist             ← bundle id, version, NSPrincipalClass
 │   └── thumbnail(@2x).png     ← picker image in System Settings (90×58 / 180×116)
@@ -379,6 +412,12 @@ Keep the build **warning-free**.
 
 ### 1.1.0 — 2026-10-26
 
+**Distribution**
+- Public repo under **GPL-3.0** (`LICENSE`).
+- `install.sh` one-line installer (latest release, `--uninstall`, `MATRIX_REF`).
+- Homebrew formula in the `WhiskeyTangoFussell/homebrew-tap` repo (builds from source).
+- Bundle version set to 1.1.0 (build 2).
+
 **Motion**
 - **Starts full**: each new simulation is fast-forwarded to a steady state
   (`RainSimulation.prewarm()`), so the saver, preview and thumbnails open on a
@@ -458,3 +497,7 @@ Keep the build **warning-free**.
 - One brightness quantizer shared by stepped and gliding modes.
 - Shared initializer in `MatrixScreenSaverView`. Options sheet fields ordered to
   match the on-screen rows. Fixed a misplaced doc comment in `Palette.swift`.
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE). Copyright © 2026 WhiskeyTangoFussell.
