@@ -73,7 +73,7 @@ extension [[RGB]] {
 
 /// The rain color palette. Raw values are persisted, so don't rename them.
 enum MatrixColor: String, CaseIterable, Sendable {
-    case tokyoNight, rainbowSpectrum, rainbowVivid
+    case tokyoNight, rainbowSpectrum, rainbowVivid, thinkpad, blackout
     case matrixGreen, emerald, lime, mint, cyan, iceBlue, azure, violet
     case magenta, pink, red, orange, amber, gold, white, rainbow
 
@@ -82,6 +82,8 @@ enum MatrixColor: String, CaseIterable, Sendable {
         case .tokyoNight: "Tokyo Night (Neon)"
         case .rainbowSpectrum: "Rainbow Spectrum (Pastel)"
         case .rainbowVivid: "Rainbow Spectrum (Vivid)"
+        case .thinkpad: "Thinkpad"
+        case .blackout: "Blackout"
         case .matrixGreen: "Matrix Green"
         case .emerald: "Emerald"
         case .lime: "Lime"
@@ -101,11 +103,19 @@ enum MatrixColor: String, CaseIterable, Sendable {
         }
     }
 
+    /// Color of the leading glyph when Bright white heads is on. Blackout dims
+    /// it so the heads don't stand out from its barely visible trails.
+    var headColor: RGB {
+        self == .blackout ? RGB(hex: 0x4A4A5E) : .white
+    }
+
     var scheme: ColorScheme {
         switch self {
         case .tokyoNight: .families(Self.tokyoNightNeon)
         case .rainbowSpectrum: .families(Self.pastelRainbow)
         case .rainbowVivid: .families(Self.vividRainbow)
+        case .thinkpad: .families(Self.thinkpadColors)
+        case .blackout: .families(Self.blackoutColors)
         case .rainbow: .rainbow
         case .matrixGreen: .solid(RGB(r: 0.00, g: 1.00, b: 0.25))
         case .emerald: .solid(RGB(r: 0.05, g: 0.80, b: 0.45))
@@ -154,5 +164,21 @@ enum MatrixColor: String, CaseIterable, Sendable {
         [RGB(hex: 0xFF9ED8), RGB(hex: 0xFF4FAE), RGB(hex: 0xC2187A)],   // pink
         [RGB(hex: 0xCDA8FF), RGB(hex: 0xA25CFF), RGB(hex: 0x6C2BD9)],   // purple
         [RGB(hex: 0x8CD5FF), RGB(hex: 0x4D8DFF), RGB(hex: 0x2A52D6)],   // blue
+    ]
+
+    /// ThinkPad colors: TrackPoint pink-red and the logo's deeper red, with
+    /// mid greys and whites, each light/medium/dark.
+    static let thinkpadColors: [[RGB]] = [
+        [RGB(hex: 0xFFA8B6), RGB(hex: 0xFF7088), RGB(hex: 0xE04862)],   // pink-red
+        [RGB(hex: 0xD8262E), RGB(hex: 0xAA1520), RGB(hex: 0x7A0C14)],   // dark red
+        [RGB(hex: 0xC8C8C8), RGB(hex: 0xA6A6A6), RGB(hex: 0x868686)],   // grey
+        [RGB(hex: 0xFFFFFF), RGB(hex: 0xF0F0F0), RGB(hex: 0xDCDCDC)],   // white
+    ]
+
+    /// Barely visible dark grey, navy and violet, each light/medium/dark.
+    static let blackoutColors: [[RGB]] = [
+        [RGB(hex: 0x3A3A3A), RGB(hex: 0x2C2C2C), RGB(hex: 0x1F1F1F)],   // grey
+        [RGB(hex: 0x1C2A4A), RGB(hex: 0x142038), RGB(hex: 0x0D1628)],   // blue
+        [RGB(hex: 0x2E1C4A), RGB(hex: 0x221438), RGB(hex: 0x170D28)],   // violet
     ]
 }

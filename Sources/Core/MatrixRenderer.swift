@@ -38,24 +38,25 @@ final class MatrixRenderer {
 
         // `bases` holds each bin's representative color (also used for its glow).
         let bases: [RGB]
+        let head = settings.color.headColor
         switch settings.color.scheme {
         case .solid(let rgb):
             coloring = .single
             bases = [rgb]
-            palette = [Self.shades(of: rgb)]
+            palette = [Self.shades(of: rgb, head: head)]
         case .rainbow:
             coloring = .rainbow
             bases = (0..<Self.rainbowBins).map { RGB.hue(CGFloat($0) / CGFloat(Self.rainbowBins)) }
-            palette = bases.map(Self.shades)
+            palette = bases.map { Self.shades(of: $0, head: head) }
         case .families(let families) where settings.blendColors:
             coloring = .spectrum
             let hues = (0..<Self.spectrumBins).map { CGFloat($0) / CGFloat(Self.spectrumBins - 1) }
             bases = hues.map { families.sample(hue: $0, shade: 0.5) }
-            palette = hues.map { Self.spectrumShades(of: families, hue: $0) }
+            palette = hues.map { Self.spectrumShades(of: families, hue: $0, head: head) }
         case .families(let families):
             coloring = .perStream
             bases = families.flatMap { $0 }
-            palette = bases.map(Self.shades)
+            palette = bases.map { Self.shades(of: $0, head: head) }
         }
         colorBins = palette.count
         glowSprites = settings.glow ? bases.compactMap(Self.glowSprite) : []
@@ -256,24 +257,24 @@ final class MatrixRenderer {
     /// Trail shades for one point of a blended spectrum: light near the head,
     /// the family's dark shade toward the tail, plus a gentler brightness fade
     /// since the dark shades already carry most of the depth.
-    private static func spectrumShades(of families: [[RGB]], hue: CGFloat) -> [CGColor] {
+    private static func spectrumShades(of families: [[RGB]], hue: CGFloat, head: RGB) -> [CGColor] {
         var colors = (0..<levels).map { level -> CGColor in
             let t = CGFloat(level + 1) / CGFloat(levels)
             return families.sample(hue: hue, shade: 1 - t).scaled(by: 0.35 + 0.65 * t).cgColor
         }
-        colors.append(RGB.white.cgColor)
+        colors.append(head.cgColor)
         return colors
     }
 
     /// Trail shades from dim to bright, followed by the head color.
-    private static func shades(of base: RGB) -> [CGColor] {
+    private static func shades(of base: RGB, head: RGB) -> [CGColor] {
         var colors = (0..<levels).map { level -> CGColor in
             let t = CGFloat(level + 1) / CGFloat(levels)
             var rgb = base.scaled(by: 0.15 + 0.85 * t)
             if t > 0.85 { rgb = rgb.mixed(with: .white, amount: 0.2) }   // hot zone just behind the head
             return rgb.cgColor
         }
-        colors.append(RGB.white.cgColor)
+        colors.append(head.cgColor)
         return colors
     }
 }
