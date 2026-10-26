@@ -74,6 +74,18 @@ final class RainSimulation {
         mutate(dt: dt)
     }
 
+    /// Fast-forwards until the rain reaches a steady state, so hosts start
+    /// with a full screen instead of an empty one filling from the top.
+    /// Long enough for the first (staggered) wave's slowest possible stream to
+    /// fall all the way through, tail included.
+    func prewarm() {
+        let stagger = max(settings.meanSpawnInterval, 1.5)
+        let longestTrail = Double(rows) * settings.meanTrailFraction * settings.lengthFactorRange.upperBound
+        let seconds = min(stagger + (Double(rows) + longestTrail) / settings.rowsPerSecond, 120)
+        let dt = MatrixScene.frameInterval
+        for _ in 0..<Int(seconds / dt) { step(dt) }
+    }
+
     // MARK: - Private
 
     private func advance(column c: Int, by distance: Double, dt: Double) {

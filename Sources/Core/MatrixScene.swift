@@ -65,6 +65,7 @@ final class MatrixScene {
             settings: settings,
             seed: seed ?? UInt64.random(in: .min ... .max)
         )
+        fresh.prewarm()
         simulation = fresh
         return fresh
     }

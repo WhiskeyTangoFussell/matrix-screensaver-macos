@@ -73,7 +73,7 @@ extension [[RGB]] {
 
 /// The rain color palette. Raw values are persisted, so don't rename them.
 enum MatrixColor: String, CaseIterable, Sendable {
-    case tokyoNight, rainbowSpectrum
+    case tokyoNight, rainbowSpectrum, rainbowVivid
     case matrixGreen, emerald, lime, mint, cyan, iceBlue, azure, violet
     case magenta, pink, red, orange, amber, gold, white, rainbow
 
@@ -81,6 +81,7 @@ enum MatrixColor: String, CaseIterable, Sendable {
         switch self {
         case .tokyoNight: "Tokyo Night (Neon)"
         case .rainbowSpectrum: "Rainbow Spectrum (Pastel)"
+        case .rainbowVivid: "Rainbow Spectrum (Vivid)"
         case .matrixGreen: "Matrix Green"
         case .emerald: "Emerald"
         case .lime: "Lime"
@@ -104,6 +105,7 @@ enum MatrixColor: String, CaseIterable, Sendable {
         switch self {
         case .tokyoNight: .families(Self.tokyoNightNeon)
         case .rainbowSpectrum: .families(Self.pastelRainbow)
+        case .rainbowVivid: .families(Self.vividRainbow)
         case .rainbow: .rainbow
         case .matrixGreen: .solid(RGB(r: 0.00, g: 1.00, b: 0.25))
         case .emerald: .solid(RGB(r: 0.05, g: 0.80, b: 0.45))
@@ -132,6 +134,17 @@ enum MatrixColor: String, CaseIterable, Sendable {
             hue.mixed(with: .white, amount: 0.6),
             hue.mixed(with: .white, amount: 0.4),
             hue.mixed(with: .white, amount: 0.25).scaled(by: 0.75),
+        ]
+    }
+
+    /// The same hues as `pastelRainbow` at full saturation: a light tint, the
+    /// pure hue, then a deeper shade.
+    static let vividRainbow: [[RGB]] = [0, 30, 55, 120, 185, 220, 270, 315].map { degrees in
+        let hue = RGB.hue(CGFloat(degrees) / 360)
+        return [
+            hue.mixed(with: .white, amount: 0.2),
+            hue,
+            hue.scaled(by: 0.7),
         ]
     }
 

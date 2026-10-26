@@ -41,7 +41,7 @@ served as the spec, and everything was designed fresh for macOS.
 - Universal binary (Apple silicon + Intel), ad-hoc signed.
 - Builds with **Command Line Tools only**. No Xcode project is needed; a `Makefile` drives `swiftc`.
 - Options sheet with a **live animated preview**.
-- **18 color modes**: Tokyo Night (Neon) and Rainbow Spectrum (Pastel), both multi-color and blendable along streams, plus 15 solid colors and an animated Rainbow.
+- **19 color modes**: Tokyo Night (Neon), Rainbow Spectrum (Pastel) and Rainbow Spectrum (Vivid), all multi-color and blendable along streams, plus 15 solid colors and an animated Rainbow.
 - 5 character sets: Classic ASCII (cmatrix default), Katakana, Katakana + Latin, Binary, Hex.
 - Any installed monospaced font (default CaskaydiaCove NF Bold), 8–48 pt.
 - Adjustable speed and speed variance, density, trail length and length variance,
@@ -51,6 +51,8 @@ served as the spec, and everything was designed fresh for macOS.
 - Toggles for bright white heads, fading trails, glow, and blending colors along streams.
 - Fast: each stream is drawn as a few short same-shade glyph runs (about 2–7 ms
   for a full Retina frame on Apple silicon, glow included).
+- **Starts full**: the rain is fast-forwarded to a steady state before the first
+  frame, so the screen is already filled when the saver starts.
 - Multi-display aware: saving options updates every running instance.
 
 ## Requirements
@@ -98,7 +100,7 @@ Running `build/snapshot` with no arguments lists them.
 | Font | System Monospaced (SF Mono) + every installed font whose letters/digits are fixed-width (includes Nerd Font "NF" builds that macOS doesn't flag as fixed-pitch) | CaskaydiaCove NF Bold (`CaskaydiaCoveNF-Bold`) | Falls back to SF Mono if the font isn't installed. Pick weight by choosing the face (Bold, SemiBold…). Missing glyphs (e.g. katakana) fall back to a system font automatically. |
 | Size | 8–48 pt | 16 | Glyph size. The System Settings thumbnail scales this down to fit. |
 | Characters | Classic ASCII · Katakana · Katakana + Latin · Binary · Hexadecimal | Classic ASCII | Classic is cmatrix's printable ASCII (`!`…`~`). Katakana uses half-width forms U+FF66–FF9D plus digits. |
-| Color | **Tokyo Night (Neon)**, **Rainbow Spectrum (Pastel)**, Matrix Green, Emerald, Lime, Mint, Cyan, Ice Blue, Azure, Violet, Magenta, Pink, Red, Orange, Amber, Gold, White, **Rainbow** | Tokyo Night (Neon) | Tokyo Night uses 9 neon colors, blended along each stream or one per stream (see *Blend colors*): pink `#FF9ED8 #FF4FAE #C2187A`, purple `#CDA8FF #A25CFF #6C2BD9`, blue `#8CD5FF #4D8DFF #2A52D6` (light/medium/dark). Rainbow Spectrum uses 8 hue families at 0°, 30°, 55°, 120°, 185°, 220°, 270° and 315° (red → magenta), each softened toward pastel: light = 60% white, medium = 40% white, dark = 25% white at 75% brightness. Rainbow sweeps hues across the columns and slowly cycles. |
+| Color | **Tokyo Night (Neon)**, **Rainbow Spectrum (Pastel)**, **Rainbow Spectrum (Vivid)**, Matrix Green, Emerald, Lime, Mint, Cyan, Ice Blue, Azure, Violet, Magenta, Pink, Red, Orange, Amber, Gold, White, **Rainbow** | Tokyo Night (Neon) | Tokyo Night uses 9 neon colors, blended along each stream or one per stream (see *Blend colors*): pink `#FF9ED8 #FF4FAE #C2187A`, purple `#CDA8FF #A25CFF #6C2BD9`, blue `#8CD5FF #4D8DFF #2A52D6` (light/medium/dark). Rainbow Spectrum uses 8 hue families at 0°, 30°, 55°, 120°, 185°, 220°, 270° and 315° (red → magenta), each softened toward pastel: light = 60% white, medium = 40% white, dark = 25% white at 75% brightness. Rainbow Spectrum (Vivid) uses the same 8 hues at full saturation: light = 20% white, medium = pure hue, dark = 70% brightness. Rainbow sweeps hues across the columns and slowly cycles. |
 | Speed | 1–10 | 4 | Head speed = `3 × (40/3)^((speed−1)/9)` rows/sec, an exponential curve: 1 → 3, 4 ≈ 7, 7 ≈ 17, 10 → 40. |
 | Speed variance | +0–300% (steps of 25) | +150% | The base Speed is the **floor**: each stream falls at base × a random factor in `1…(1 + v)`, so +150% → 1×–2.5× (≈7–18 rows/s at default speed), like cmatrix `-a`. 0% gives every stream the base speed. |
 | Density | 1–10 (steps of 0.5) | 4.5 | Mean wait before a column launches its next stream, measured from when the previous stream clears the top: `8 s × (0.15/8)^((d−1)/9)`, i.e. 8 s down to 0.15 s. |
@@ -108,7 +110,7 @@ Running `build/snapshot` with no arguments lists them.
 | Gliding motion | on/off | on | Characters stay fixed in the grid while the light glides over them: the white head crossfades smoothly from cell to cell and the trail fades continuously. Off gives the classic cmatrix look, where the lit band steps a whole row at a time. Speed is identical either way. |
 | Bright white heads | on/off | on | Leading glyph drawn pure white (cmatrix `-b`). |
 | Fade trails | on/off | on | Tail dims toward black over 10 steps. Off gives cmatrix's flat, hard-edged look. |
-| Blend colors along streams | on/off | on | Multi-color schemes only (Tokyo Night, Rainbow Spectrum). On: each stream sweeps the theme's whole spectrum (e.g. pink → purple → blue) from head to tail, light shades near the head and dark toward the tail, starting at a random point and direction. Off: each stream is one of the 9 colors. |
+| Blend colors along streams | on/off | on | Multi-color schemes only (Tokyo Night, both Rainbow Spectrums). On: each stream sweeps the theme's whole spectrum (e.g. pink → purple → blue) from head to tail, light shades near the head and dark toward the tail, starting at a random point and direction. Off: each stream is one of the 9 colors. |
 | Glow | on/off | on | Subtle halo behind each head, tinted with its stream's color: a pre-rendered radial-gradient sprite at 1.6× the cell size. |
 
 Settings live in the ScreenSaver defaults domain `com.fussell.MatrixScreenSaver`.
@@ -133,7 +135,7 @@ The `make run` preview app reads and writes a separate, non-sandboxed copy.
 existing ones), give it a `displayName`, and return its `scheme`: `.solid(RGB)`
 for one color, or `.families([[light, medium, dark], …])` for a multi-color theme.
 That gets blending, per-stream colors, the menu swatch and glow automatically
-(see `tokyoNightNeon` and `pastelRainbow`). Then document it in the Color row above.
+(see `tokyoNightNeon`, `pastelRainbow` and `vividRainbow`). Then document it in the Color row above.
 
 ## Project layout
 
@@ -211,7 +213,11 @@ holds a glyph. *Streams* decide which cells are visible.
    (`maxFollowSpeed`). Streams never overlap; a 2-minute simulation found zero overlaps.
 5. Streams are removed once their tail passes the bottom.
 6. **Mutation:** each step, about `cells × rate × dt` random cells get a new glyph.
-7. At startup, columns get staggered cooldowns so the screen fills in gradually.
+7. At startup, columns get staggered cooldowns, then `RainSimulation.prewarm()`
+   fast-forwards (called by `MatrixScene` whenever it builds a simulation) until the
+   slowest first-wave stream could have fallen all the way through, tail included
+   (capped at 120 simulated seconds). Every host therefore opens on a full,
+   steady-state screen instead of an empty one filling from the top.
 
 **Gliding motion (default).** Characters never move; they live in the grid
 exactly as in stepped mode. Only the light glides. With fractional head `h` in
@@ -367,6 +373,18 @@ Keep the build **warning-free**.
 - [ ] Notarized release build (needs a Developer ID).
 
 ## Changelog
+
+### 1.1.0 — 2026-10-26
+
+**Motion**
+- **Starts full**: each new simulation is fast-forwarded to a steady state
+  (`RainSimulation.prewarm()`), so the saver, preview and thumbnails open on a
+  filled screen. Changes every render, so the render-check baseline was regenerated.
+
+**Look**
+- **Rainbow Spectrum (Vivid)** theme (key `rainbowVivid`): the Pastel theme's 8 hue
+  families at full saturation (light = 20% white, medium = pure hue, dark = 70%
+  brightness).
 
 ### 1.0.0 — 2026-10-25
 
