@@ -411,7 +411,7 @@ Keep the build **warning-free**.
 
 ## Changelog
 
-### Unreleased
+### 1.3.0 — 2026-10-27
 
 - The 1.2.0 grey, blue and violet theme is renamed **Midnight** (saved as
   `midnight`) and gains a fourth color, deep indigo, between its blue and violet.
