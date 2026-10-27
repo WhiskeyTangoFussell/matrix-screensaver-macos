@@ -108,7 +108,8 @@ enum MatrixColor: String, CaseIterable, Sendable {
     /// Blackout dim it so the heads don't stand out from their barely visible trails.
     var headColor: RGB {
         switch self {
-        case .midnight, .blackout: RGB(hex: 0x4A4A5E)
+        case .midnight: RGB(hex: 0x4A4A5E)
+        case .blackout: RGB(hex: 0x404040)
         default: .white
         }
     }
