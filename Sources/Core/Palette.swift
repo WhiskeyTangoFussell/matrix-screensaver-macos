@@ -73,7 +73,7 @@ extension [[RGB]] {
 
 /// The rain color palette. Raw values are persisted, so don't rename them.
 enum MatrixColor: String, CaseIterable, Sendable {
-    case tokyoNight, rainbowSpectrum, rainbowVivid, thinkpad, blackout
+    case tokyoNight, rainbowSpectrum, rainbowVivid, thinkpad, midnight, blackout
     case matrixGreen, emerald, lime, mint, cyan, iceBlue, azure, violet
     case magenta, pink, red, orange, amber, gold, white, rainbow
 
@@ -83,6 +83,7 @@ enum MatrixColor: String, CaseIterable, Sendable {
         case .rainbowSpectrum: "Rainbow Spectrum (Pastel)"
         case .rainbowVivid: "Rainbow Spectrum (Vivid)"
         case .thinkpad: "Thinkpad"
+        case .midnight: "Midnight"
         case .blackout: "Blackout"
         case .matrixGreen: "Matrix Green"
         case .emerald: "Emerald"
@@ -103,10 +104,13 @@ enum MatrixColor: String, CaseIterable, Sendable {
         }
     }
 
-    /// Color of the leading glyph when Bright white heads is on. Blackout dims
-    /// it so the heads don't stand out from its barely visible trails.
+    /// Color of the leading glyph when Bright white heads is on. Midnight and
+    /// Blackout dim it so the heads don't stand out from their barely visible trails.
     var headColor: RGB {
-        self == .blackout ? RGB(hex: 0x4A4A5E) : .white
+        switch self {
+        case .midnight, .blackout: RGB(hex: 0x4A4A5E)
+        default: .white
+        }
     }
 
     var scheme: ColorScheme {
@@ -115,6 +119,7 @@ enum MatrixColor: String, CaseIterable, Sendable {
         case .rainbowSpectrum: .families(Self.pastelRainbow)
         case .rainbowVivid: .families(Self.vividRainbow)
         case .thinkpad: .families(Self.thinkpadColors)
+        case .midnight: .families(Self.midnightColors)
         case .blackout: .families(Self.blackoutColors)
         case .rainbow: .rainbow
         case .matrixGreen: .solid(RGB(r: 0.00, g: 1.00, b: 0.25))
@@ -175,10 +180,19 @@ enum MatrixColor: String, CaseIterable, Sendable {
         [RGB(hex: 0xFFFFFF), RGB(hex: 0xF0F0F0), RGB(hex: 0xDCDCDC)],   // white
     ]
 
-    /// Barely visible dark grey, navy and violet, each light/medium/dark.
-    static let blackoutColors: [[RGB]] = [
+    /// Barely visible dark grey, navy, indigo and violet, each light/medium/dark.
+    static let midnightColors: [[RGB]] = [
         [RGB(hex: 0x3A3A3A), RGB(hex: 0x2C2C2C), RGB(hex: 0x1F1F1F)],   // grey
         [RGB(hex: 0x1C2A4A), RGB(hex: 0x142038), RGB(hex: 0x0D1628)],   // blue
+        [RGB(hex: 0x22205A), RGB(hex: 0x191744), RGB(hex: 0x100F2E)],   // indigo
         [RGB(hex: 0x2E1C4A), RGB(hex: 0x221438), RGB(hex: 0x170D28)],   // violet
+    ]
+
+    /// Near-black and dark grey, each light/medium/dark, all just above the
+    /// black background.
+    static let blackoutColors: [[RGB]] = [
+        [RGB(hex: 0x1A1A1A), RGB(hex: 0x141414), RGB(hex: 0x0E0E0E)],   // black
+        [RGB(hex: 0x262626), RGB(hex: 0x1F1F1F), RGB(hex: 0x181818)],   // charcoal
+        [RGB(hex: 0x333333), RGB(hex: 0x2A2A2A), RGB(hex: 0x212121)],   // dark grey
     ]
 }

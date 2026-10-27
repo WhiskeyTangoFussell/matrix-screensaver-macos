@@ -39,7 +39,7 @@ served as the spec, and everything was designed fresh for macOS.
 - Builds with **Command Line Tools only**. No Xcode project is needed; a `Makefile` drives `swiftc`.
 - Options sheet with a **live animated preview**.
 - **21 color modes**: Tokyo Night (Neon), Rainbow Spectrum (Pastel), Rainbow
-  Spectrum (Vivid), Thinkpad and Blackout, all multi-color and blendable along streams, plus 15 solid
+  Spectrum (Vivid), Thinkpad, Midnight and Blackout, all multi-color and blendable along streams, plus 15 solid
   colors and an animated Rainbow.
 - **8 character sets**: Classic (cmatrix's ASCII, default), Hexadecimal, Binary,
   Unicode (letters from nine writing systems), Katakana, Katakana (Combined) with
@@ -137,7 +137,7 @@ Running `build/snapshot` with no arguments lists them.
 | Font | System Monospaced (SF Mono) + every installed font whose letters/digits are fixed-width (includes Nerd Font "NF" builds that macOS doesn't flag as fixed-pitch) | CaskaydiaCove NF Bold (`CaskaydiaCoveNF-Bold`) | Falls back to SF Mono if the font isn't installed. Pick weight by choosing the face (Bold, SemiBold…). Characters the font lacks (e.g. katakana) come from a system fallback font automatically. |
 | Size | 8–48 pt | 16 | Glyph size. The System Settings thumbnail scales this down to fit. |
 | Characters | Classic · Hexadecimal · Binary · Unicode · Katakana · Katakana (Combined) · Katakana (Enhanced) · Katakana (Film) | Classic | **Classic** (`classic`) is cmatrix's printable ASCII (`!`…`~`). **Hexadecimal** (`hex`) is `0–9 A–F`; **Binary** (`binary`) is `0 1`. **Unicode** (`unicode`) mixes ~600 standalone letters from Latin (accented), Greek, Cyrillic, Hebrew, Arabic, Armenian, Georgian and Runic with katakana and digits; combining marks are excluded by Unicode category. **Katakana** (`katakana`) uses half-width forms U+FF66–FF9D plus digits. **Combined** (`mixed`) adds Latin capitals and symbols. **Enhanced** (`katakanaEnhanced`) adds a left-right mirrored copy of every katakana, so both orientations rain together. **Film** (`katakanaFilm`) is mirrored katakana with normal digits and the symbols `:."=*+-<>\|¦`, like the movie. |
-| Color | **Tokyo Night (Neon)**, **Rainbow Spectrum (Pastel)**, **Rainbow Spectrum (Vivid)**, **Thinkpad**, **Blackout**, Matrix Green, Emerald, Lime, Mint, Cyan, Ice Blue, Azure, Violet, Magenta, Pink, Red, Orange, Amber, Gold, White, **Rainbow** | Tokyo Night (Neon) | Tokyo Night uses 9 neon colors: pink `#FF9ED8 #FF4FAE #C2187A`, purple `#CDA8FF #A25CFF #6C2BD9`, blue `#8CD5FF #4D8DFF #2A52D6` (light/medium/dark). Rainbow Spectrum (Pastel) uses 8 hue families at 0°, 30°, 55°, 120°, 185°, 220°, 270° and 315° (red → magenta), softened toward pastel: light = 60% white, medium = 40% white, dark = 25% white at 75% brightness. Rainbow Spectrum (Vivid) uses the same 8 hues at full saturation: light = 20% white, medium = pure hue, dark = 70% brightness. Thinkpad uses 12 colors: pink-red `#FFA8B6 #FF7088 #E04862`, dark red `#D8262E #AA1520 #7A0C14`, grey `#C8C8C8 #A6A6A6 #868686`, white `#FFFFFF #F0F0F0 #DCDCDC`. Blackout uses 9 barely visible colors: grey `#3A3A3A #2C2C2C #1F1F1F`, blue `#1C2A4A #142038 #0D1628`, violet `#2E1C4A #221438 #170D28`, with dim `#4A4A5E` heads instead of white so nothing stands out. Rainbow sweeps hues across the columns and slowly cycles. |
+| Color | **Tokyo Night (Neon)**, **Rainbow Spectrum (Pastel)**, **Rainbow Spectrum (Vivid)**, **Thinkpad**, **Midnight**, **Blackout**, Matrix Green, Emerald, Lime, Mint, Cyan, Ice Blue, Azure, Violet, Magenta, Pink, Red, Orange, Amber, Gold, White, **Rainbow** | Tokyo Night (Neon) | Tokyo Night uses 9 neon colors: pink `#FF9ED8 #FF4FAE #C2187A`, purple `#CDA8FF #A25CFF #6C2BD9`, blue `#8CD5FF #4D8DFF #2A52D6` (light/medium/dark). Rainbow Spectrum (Pastel) uses 8 hue families at 0°, 30°, 55°, 120°, 185°, 220°, 270° and 315° (red → magenta), softened toward pastel: light = 60% white, medium = 40% white, dark = 25% white at 75% brightness. Rainbow Spectrum (Vivid) uses the same 8 hues at full saturation: light = 20% white, medium = pure hue, dark = 70% brightness. Thinkpad uses 12 colors: pink-red `#FFA8B6 #FF7088 #E04862`, dark red `#D8262E #AA1520 #7A0C14`, grey `#C8C8C8 #A6A6A6 #868686`, white `#FFFFFF #F0F0F0 #DCDCDC`. Midnight uses 12 barely visible colors: grey `#3A3A3A #2C2C2C #1F1F1F`, blue `#1C2A4A #142038 #0D1628`, indigo `#22205A #191744 #100F2E`, violet `#2E1C4A #221438 #170D28`, with dim `#4A4A5E` heads instead of white so nothing stands out. Blackout uses 9 colors just above the black background: black `#1A1A1A #141414 #0E0E0E`, charcoal `#262626 #1F1F1F #181818`, dark grey `#333333 #2A2A2A #212121`, with the same dim `#4A4A5E` heads. Rainbow sweeps hues across the columns and slowly cycles. |
 | Speed | 1–10 | 4 | Head speed = `3 × (40/3)^((speed−1)/9)` rows/sec, an exponential curve: 1 → 3, 4 ≈ 7, 7 ≈ 17, 10 → 40. |
 | Speed variance | +0–300% (steps of 25) | +150% | The base Speed is the **floor**: each stream falls at base × a random factor in `1…(1 + v)`, so +150% → 1×–2.5× (≈7–18 rows/s at default speed), like cmatrix `-a`. 0% gives every stream the base speed. |
 | Density | 1–10 (steps of 0.5) | 4.5 | Mean wait before a column launches its next stream, measured from when the previous stream clears the top: `8 s × (0.15/8)^((d−1)/9)`, i.e. 8 s down to 0.15 s. |
@@ -145,9 +145,9 @@ Running `build/snapshot` with no arguments lists them.
 | Length variance | ±0–100% (steps of 10) | ±50% | Each stream's length is the baseline × a random factor in `1 ± v` (the low end is floored at 0.15). |
 | Glyph changes | 0–10 | 3 | Each cell re-rolls its character `0.05 × value` times per second (the cmatrix "flicker"). |
 | Gliding motion | on/off | on | Characters stay fixed in the grid while the light glides over them: the white head crossfades smoothly from cell to cell and the trail fades continuously. Off gives the classic cmatrix look, where the lit band steps a whole row at a time. Speed is identical either way. |
-| Bright white heads | on/off | on | Leading glyph drawn pure white (cmatrix `-b`), or the theme's dim head color for Blackout. |
+| Bright white heads | on/off | on | Leading glyph drawn pure white (cmatrix `-b`), or the theme's dim head color for Midnight and Blackout. |
 | Fade trails | on/off | on | Tail dims toward black over 10 steps. Off gives cmatrix's flat, hard-edged look. |
-| Blend colors along streams | on/off | on | Multi-color themes only (Tokyo Night, both Rainbow Spectrums, Thinkpad and Blackout). On: each stream sweeps the theme's whole spectrum (e.g. pink → purple → blue) from head to tail, light shades near the head and dark toward the tail, starting at a random point and direction. Off: each stream uses one of the theme's colors. |
+| Blend colors along streams | on/off | on | Multi-color themes only (Tokyo Night, both Rainbow Spectrums, Thinkpad, Midnight and Blackout). On: each stream sweeps the theme's whole spectrum (e.g. pink → purple → blue) from head to tail, light shades near the head and dark toward the tail, starting at a random point and direction. Off: each stream uses one of the theme's colors. |
 | Glow | on/off | on | Subtle halo behind each head, tinted with its stream's color: a pre-rendered radial-gradient sprite at 1.6× the cell size. |
 
 Settings live in the ScreenSaver defaults domain `com.fussell.MatrixScreenSaver`.
@@ -172,7 +172,7 @@ The `make run` preview app reads and writes a separate, non-sandboxed copy.
 existing ones), give it a `displayName`, and return its `scheme`: `.solid(RGB)`
 for one color, or `.families([[light, medium, dark], …])` for a multi-color theme.
 That gets blending, per-stream colors, the menu swatch and glow automatically
-(see `tokyoNightNeon`, `pastelRainbow`, `vividRainbow`, `thinkpadColors` and `blackoutColors`). Then document it in the Color row above.
+(see `tokyoNightNeon`, `pastelRainbow`, `vividRainbow`, `thinkpadColors`, `midnightColors` and `blackoutColors`). Then document it in the Color row above.
 
 **Adding a character set:** add a case to `GlyphStyle` with a `displayName` and its
 `characters`. List any characters that should also appear flipped left-to-right in
@@ -411,10 +411,18 @@ Keep the build **warning-free**.
 
 ## Changelog
 
+### Unreleased
+
+- The 1.2.0 grey, blue and violet theme is renamed **Midnight** (saved as
+  `midnight`) and gains a fourth color, deep indigo, between its blue and violet.
+- New **Blackout** theme: near-black and dark grey shades just above the
+  background, with the same dimmed heads. Saved 1.2.0 Blackout choices now get
+  this theme; pick Midnight to get the old colors back.
+
 ### 1.2.0 — 2026-10-26
 
 - **Thinkpad** color theme: pink-red, dark red, grey and white.
-- **Blackout** color theme: barely visible dark grey, blue and violet, with dimmed heads.
+- **Midnight** color theme (released as "Blackout"): barely visible dark grey, blue and violet, with dimmed heads.
 
 ### 1.1.0 — 2026-10-26
 
