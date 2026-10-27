@@ -4,8 +4,9 @@ import CoreGraphics
 /// settings or the drawing surface change. Every host (screen saver view,
 /// live preview, snapshot tool) drives the effect through this one type.
 final class MatrixScene {
-    /// How often hosts advance and redraw. Motion is time-based (`advance(by:)`),
-    /// so this only affects smoothness, not speed.
+    /// Fixed step for prewarming and the offline tools. Live hosts redraw at
+    /// `MatrixSettings.frameInterval` instead; motion is time-based
+    /// (`advance(by:)`), so the step only affects smoothness, not speed.
     static let frameInterval: Double = 1.0 / 30
 
     private(set) var settings: MatrixSettings

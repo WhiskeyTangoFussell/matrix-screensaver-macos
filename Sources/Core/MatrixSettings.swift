@@ -21,12 +21,14 @@ struct MatrixSettings: Equatable, Sendable {
     var glow = true                    // soft bloom around heads
     var blendColors = true             // multi-color schemes: gradient along each stream
     var glidingMotion = true           // light glides smoothly over fixed characters; off = cmatrix row steps
+    var frameRate = 30                 // frames per second, one of `frameRates`
 
     static let fontSizeRange: ClosedRange<Double> = 8...48
     static let levelRange: ClosedRange<Double> = 1...10
     static let mutationRange: ClosedRange<Double> = 0...10
     static let varianceRange: ClosedRange<Double> = 0...100
     static let spreadRange: ClosedRange<Double> = 0...300
+    static let frameRates = [30, 60]
 }
 
 // MARK: - Derived simulation values
@@ -61,6 +63,10 @@ extension MatrixSettings {
         return max(1 - v, 0.15)...(1 + v)
     }
 
+    /// Seconds between frames. Motion is time-based, so this only affects
+    /// smoothness (and CPU use), not speed.
+    var frameInterval: Double { 1 / Double(frameRate) }
+
     /// Probability per second that any single cell swaps to a new glyph.
     var mutationsPerCellPerSecond: Double { mutationRate * 0.05 }
 }
@@ -84,6 +90,7 @@ extension MatrixSettings {
         static let glow = "glow"
         static let blendColors = "blendColors"
         static let glidingMotion = "glidingMotion"
+        static let frameRate = "frameRate"
     }
 
     /// Reads settings, falling back to defaults for missing or invalid values.
@@ -112,6 +119,8 @@ extension MatrixSettings {
         glow = bool(Key.glow, fallback.glow)
         blendColors = bool(Key.blendColors, fallback.blendColors)
         glidingMotion = bool(Key.glidingMotion, fallback.glidingMotion)
+        let savedRate = defaults.integer(forKey: Key.frameRate)
+        frameRate = Self.frameRates.contains(savedRate) ? savedRate : fallback.frameRate
     }
 
     func save(to defaults: UserDefaults) {
@@ -130,6 +139,7 @@ extension MatrixSettings {
         defaults.set(glow, forKey: Key.glow)
         defaults.set(blendColors, forKey: Key.blendColors)
         defaults.set(glidingMotion, forKey: Key.glidingMotion)
+        defaults.set(frameRate, forKey: Key.frameRate)
         defaults.synchronize()
     }
 }

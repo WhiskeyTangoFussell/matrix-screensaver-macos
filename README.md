@@ -144,6 +144,7 @@ Running `build/snapshot` with no arguments lists them.
 | Trail length | 1–10 | 5 | Baseline trail = `0.08 + 0.6 × (t−1)/9` of screen height (at least 3 glyphs). |
 | Length variance | ±0–100% (steps of 10) | ±50% | Each stream's length is the baseline × a random factor in `1 ± v` (the low end is floored at 0.15). |
 | Glyph changes | 0–10 | 3 | Each cell re-rolls its character `0.05 × value` times per second (the cmatrix "flicker"). |
+| Frame rate | 30 fps · 60 fps | 30 fps | How often the saver redraws (`frameRate`). Motion is time-based, so speed is identical either way; 60 fps is smoother but roughly doubles CPU use (frames cost ~2–7 ms). Prewarming and the snapshot/render-check tools always step at 1/30 s. |
 | Gliding motion | on/off | on | Characters stay fixed in the grid while the light glides over them: the white head crossfades smoothly from cell to cell and the trail fades continuously. Off gives the classic cmatrix look, where the lit band steps a whole row at a time. Speed is identical either way. |
 | Bright white heads | on/off | on | Leading glyph drawn pure white (cmatrix `-b`), or the theme's dim head color for Midnight and Blackout. |
 | Fade trails | on/off | on | Tail dims toward black over 10 steps. Off gives cmatrix's flat, hard-edged look. |
@@ -232,8 +233,9 @@ matrix-screensaver-macos/
   mode changes, or the surface resizes, it rebuilds (and prewarms) the simulation
   grid. Other changes (color, speed, …) apply live without resetting the rain.
 - **Time is explicit.** Hosts pass a real `dt` (clamped to 0.1 s), so
-  animation speed doesn't depend on frame rate. Every host runs at
-  `MatrixScene.frameInterval` (30 fps); change it in that one place.
+  animation speed doesn't depend on frame rate. Live hosts redraw at the
+  Frame rate setting (`MatrixSettings.frameInterval`, 30 or 60 fps); prewarming
+  and the offline tools use the fixed `MatrixScene.frameInterval` (1/30 s).
 
 ## How the rain works
 
@@ -402,14 +404,15 @@ Keep the build **warning-free**.
 ## Roadmap
 
 - [ ] Metal renderer for very small fonts on 6K/8K displays.
-- [ ] "Message" mode that spells a custom phrase through the rain.
-- [ ] Per-display color or style.
-- [ ] Optional 60 fps (change `MatrixScene.frameInterval`; frames cost ~2–7 ms,
-  so it's affordable but roughly doubles CPU use).
 - [ ] Unit tests for `RainSimulation` (needs XCTest / swift-testing from a full Xcode install).
 - [ ] Developer ID signed and notarized release build.
+- [ ] More themes coming soon.
 
 ## Changelog
+
+### 1.3.2 — 2026-10-27
+
+- **Frame rate** option: 30 fps (default) or 60 fps.
 
 ### 1.3.1 — 2026-10-27
 

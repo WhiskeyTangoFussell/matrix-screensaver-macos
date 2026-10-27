@@ -23,6 +23,7 @@ final class ConfigureSheetController: NSObject {
     private let trailSlider = LabeledSlider(range: MatrixSettings.levelRange)
     private let lengthVarianceSlider = LabeledSlider(range: MatrixSettings.varianceRange, step: 10, format: "±%.0f%%")
     private let mutationSlider = LabeledSlider(range: MatrixSettings.mutationRange)
+    private let frameRatePopup = NSPopUpButton()
     private let glideCheckbox = NSButton(checkboxWithTitle: "Gliding motion", target: nil, action: nil)
     private let brightHeadsCheckbox = NSButton(checkboxWithTitle: "Bright white heads", target: nil, action: nil)
     private let fadeCheckbox = NSButton(checkboxWithTitle: "Fade trails", target: nil, action: nil)
@@ -72,6 +73,7 @@ final class ConfigureSheetController: NSObject {
             [label("Trail length:"), trailSlider],
             [label("Length variance:"), lengthVarianceSlider],
             [label("Glyph changes:"), mutationSlider],
+            [label("Frame rate:"), frameRatePopup],
             [label("Effects:"), effects],
         ])
         grid.rowSpacing = 10
@@ -83,7 +85,7 @@ final class ConfigureSheetController: NSObject {
         effectsRow.rowAlignment = .none
         grid.column(at: 1).width = 260
 
-        for control in [fontPopup, glyphPopup, colorPopup] {
+        for control in [fontPopup, glyphPopup, colorPopup, frameRatePopup] {
             control.target = self
             control.action = #selector(controlChanged)
         }
@@ -164,6 +166,9 @@ final class ConfigureSheetController: NSObject {
             colorPopup.addItem(withTitle: color.displayName)
             colorPopup.lastItem?.image = Self.swatch(for: color)
         }
+
+        frameRatePopup.removeAllItems()
+        frameRatePopup.addItems(withTitles: MatrixSettings.frameRates.map { "\($0) fps" })
     }
 
     private func populate() {
@@ -177,6 +182,7 @@ final class ConfigureSheetController: NSObject {
         trailSlider.value = settings.trailLength
         lengthVarianceSlider.value = settings.lengthVariance
         mutationSlider.value = settings.mutationRate
+        frameRatePopup.selectItem(at: MatrixSettings.frameRates.firstIndex(of: settings.frameRate) ?? 0)
         glideCheckbox.state = settings.glidingMotion ? .on : .off
         brightHeadsCheckbox.state = settings.brightHeads ? .on : .off
         fadeCheckbox.state = settings.fadeTrails ? .on : .off
@@ -199,6 +205,7 @@ final class ConfigureSheetController: NSObject {
         settings.trailLength = trailSlider.value
         settings.lengthVariance = lengthVarianceSlider.value
         settings.mutationRate = mutationSlider.value
+        settings.frameRate = MatrixSettings.frameRates[max(frameRatePopup.indexOfSelectedItem, 0)]
         settings.glidingMotion = glideCheckbox.state == .on
         settings.brightHeads = brightHeadsCheckbox.state == .on
         settings.fadeTrails = fadeCheckbox.state == .on

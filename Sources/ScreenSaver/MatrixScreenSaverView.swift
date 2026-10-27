@@ -28,13 +28,16 @@ final class MatrixScreenSaverView: ScreenSaverView {
     }
 
     private func finishInit() {
-        animationTimeInterval = MatrixScene.frameInterval
+        animationTimeInterval = scene.settings.frameInterval
         observeNotifications()
     }
 
     /// Applies settings to this instance only, without saving them.
     func apply(_ settings: MatrixSettings) {
         scene.apply(settings)
+        if animationTimeInterval != settings.frameInterval {
+            animationTimeInterval = settings.frameInterval
+        }
     }
 
     // MARK: - Animation

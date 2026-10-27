@@ -18,16 +18,22 @@ final class MatrixPreviewView: NSView {
     required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     func apply(_ settings: MatrixSettings) {
+        let rateChanged = settings.frameRate != scene.settings.frameRate
         scene.apply(settings)
+        if rateChanged { restartTimer() }
         needsDisplay = true
     }
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        restartTimer()
+    }
+
+    private func restartTimer() {
         timer?.invalidate()
         timer = nil
         guard window != nil else { return }
-        let timer = Timer(timeInterval: MatrixScene.frameInterval, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: scene.settings.frameInterval, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
         RunLoop.main.add(timer, forMode: .common)
